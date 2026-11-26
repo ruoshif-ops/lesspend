@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f7f2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="少花了">
+<meta name="description" content="适配 iPhone Duo 内外屏的私人省钱记录工具">
+<link rel="manifest" href="manifest.webmanifest">
+<title>少花了 · LessSpend | iPhone Duo</title>
+<style>
+:root{--bg:#f7f7f2;--card:#fff;--ink:#20251f;--muted:#7d857b;--green:#287a50;--pale:#e8f2e9;--line:#e9ece6;--red:#a34d3e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+.app{max-width:520px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom))}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.brand{font-size:19px;font-weight:750;letter-spacing:-.5px}.brand small{display:block;color:var(--muted);font-size:11px;font-weight:500;letter-spacing:1.5px;margin-top:3px}
+.pill{font-size:11px;color:var(--green);background:var(--pale);padding:7px 10px;border-radius:30px}
+.hero{background:#1f382a;color:white;border-radius:25px;padding:24px 22px 22px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:190px;height:190px;border:1px solid #ffffff20;border-radius:50%;right:-75px;top:-80px;box-shadow:0 0 0 25px #ffffff08,0 0 0 50px #ffffff06}
+.eyebrow{font-size:12px;color:#c8d9cc}.amount{font-size:43px;letter-spacing:-1.5px;font-weight:750;margin:10px 0 4px}.sub{font-size:11px;color:#c8d9cc;line-height:1.6}.stats{display:flex;gap:0;margin-top:23px;border-top:1px solid #ffffff25;padding-top:17px}.stat{flex:1}.stat+ .stat{border-left:1px solid #ffffff25;padding-left:17px}.stat b{display:block;font-size:19px}.stat span{font-size:11px;color:#c8d9cc}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:25px 2px 12px}.section-head h2{font-size:16px;margin:0}.section-head span{font-size:11px;color:var(--muted)}
+.primary{width:100%;border:0;background:var(--green);color:white;padding:16px;border-radius:16px;font-size:15px;font-weight:650;margin-top:16px;box-shadow:0 5px 15px #287a5022}
+.card{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:16px}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick .card{padding:14px}.quick strong{display:block;font-size:20px;margin-top:7px}.quick small{color:var(--muted);font-size:11px}.dot{width:8px;height:8px;display:inline-block;border-radius:50%;background:var(--green);margin-right:6px}
+.entry{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.entry:last-child{border-bottom:0;padding-bottom:0}.emoji{width:40px;height:40px;border-radius:13px;background:#f1f3ed;display:grid;place-items:center;font-size:19px}.entry-main{flex:1;min-width:0}.entry-main b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.entry-main small{font-size:11px;color:var(--muted)}.entry-amt{text-align:right;font-weight:700;color:var(--green);font-size:14px}.entry-amt small{display:block;color:var(--muted);font-weight:400;font-size:10px;margin-top:3px}
+.empty{text-align:center;color:var(--muted);padding:28px 10px;font-size:12px;line-height:1.8}
+nav{display:flex;gap:8px;margin:20px 0 5px}.tab{flex:1;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:13px;padding:11px 5px;font-size:12px}.tab.active{background:var(--pale);border-color:#cfe2d1;color:var(--green);font-weight:650}
+.view{display:none}.view.active{display:block}
+label{display:block;font-size:12px;color:#596258;margin:14px 0 7px}input,select,textarea{width:100%;border:1px solid var(--line);background:#fbfcf9;border-radius:12px;padding:13px;font-size:15px;color:var(--ink);font-family:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:#78a88a}textarea{min-height:75px;resize:vertical}
+.form-actions{display:flex;gap:9px;margin-top:18px}.secondary{flex:1;border:1px solid var(--line);background:#fff;border-radius:13px;padding:14px;font-size:14px}.save{flex:2;border:0;background:var(--green);color:white;border-radius:13px;padding:14px;font-size:14px;font-weight:650}
+.note{font-size:11px;line-height:1.7;color:var(--muted);margin-top:12px}
+.rowline{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);font-size:13px}.rowline:last-child{border:0}.danger{color:var(--red);border-color:#f0d8d3}
+.smallbtn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:11px;color:#596258}
+footer{text-align:center;color:#9ba198;font-size:10px;margin:24px 0 4px}
+@media(min-width:520px){.app{padding-top:30px}}
+
+/* iPhone Duo foldable adaptation: outer display stays compact; inner display uses the wider canvas */
+@media (min-width: 600px) {
+  .app { max-width: 1040px; padding: 28px 30px 36px; }
+  header { margin-bottom: 28px; }
+  .hero { padding: 30px 32px; }
+  .hero .amount { font-size: 54px; }
+  .hero .stats { max-width: 520px; }
+  #home.view.active {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+    column-gap: 22px;
+    align-items: start;
+  }
+  #home .hero { grid-column: 1 / -1; }
+  #home > .primary { grid-column: 1 / -1; max-width: 360px; }
+  #home .section-head:nth-of-type(1) { grid-column: 1; }
+  #home #recent { grid-column: 1; }
+  #home .section-head:nth-of-type(2) { grid-column: 2; grid-row: 3; }
+  #home .quick { grid-column: 2; grid-row: 4; }
+  #home .quick .card { min-height: 104px; }
+  nav { max-width: 620px; margin: 24px auto 6px; }
+  #add .card { max-width: 760px; margin: 0 auto; }
+  #add .section-head { max-width: 760px; margin-left: auto; margin-right: auto; }
+  #history .card, #history .section-head, #settings .card, #settings .section-head, #settings .note { max-width: 850px; margin-left: auto; margin-right: auto; }
+}
+@media (min-width: 600px) and (orientation: landscape) {
+  .app { max-width: 1180px; }
+  #home.view.active { grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr); }
+}
+@media (max-width: 599px) {
+  .app { max-width: 460px; }
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand">少花了 <small>LESSSPEND · 私人省钱记录</small></div><div class="pill">仅保存在本机</div></header>
+
+<section id="home" class="view active">
+  <div class="hero">
+    <div class="eyebrow">累计避免消费金额</div>
+    <div class="amount" id="total">$0.00</div>
+    <div class="sub">记录那些“想买但最后没买”的瞬间。<br>这是避免支出，不等于银行账户实际增加的存款。</div>
+    <div class="stats">
+      <div class="stat"><b id="monthTotal">$0</b><span>本月少花</span></div>
+      <div class="stat"><b id="count">0</b><span>成功克制次数</span></div>
+    </div>
+  </div>
+  <button class="primary" onclick="show('add')">＋ 记录今天少花的钱</button>
+  <div class="section-head"><h2>最近记录</h2><span id="recentCount">0 条记录</span></div>
+  <div class="card" id="recent"></div>
+  <div class="section-head"><h2>本月小结</h2><span id="monthLabel"></span></div>
+  <div class="quick">
+    <div class="card"><small><i class="dot"></i>本月记录次数</small><strong id="monthCount">0 次</strong></div>
+    <div class="card"><small><i class="dot"></i>平均每次少花</small><strong id="average">$0</strong></div>
+  </div>
+</section>
+
+<section id="add" class="view">
+  <div class="section-head"><h2 id="formTitle">记下一次成功克制</h2><span>大约 20 秒</span></div>
+  <div class="card">
+    <form id="recordForm">
+      <input type="hidden" id="editId">
+      <label for="thing">当时想买什么？</label><input id="thing" maxlength="60" placeholder="例如：一双运动鞋" required>
+      <label for="amountInput">原本打算花多少钱？</label><input id="amountInput" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="例如：150" required>
+      <label for="currency">货币</label><select id="currency"><option value="USD">美元 USD</option><option value="CNY">人民币 CNY</option><option value="HKD">港币 HKD</option><option value="JPY">日元 JPY</option><option value="SGD">新加坡元 SGD</option><option value="EUR">欧元 EUR</option></select>
+      <label for="category">消费类别</label><select id="category"><option>购物</option><option>餐饮</option><option>数码产品</option><option>娱乐</option><option>出行</option><option>订阅服务</option><option>其他</option></select>
+      <label for="date">日期</label><input id="date" type="date" required>
+      <label for="reason">为什么最后没买？（选填）</label><textarea id="reason" maxlength="200" placeholder="例如：发现家里已经有类似的了"></textarea>
+      <div class="form-actions"><button type="button" class="secondary" onclick="show('home')">取消</button><button class="save" type="submit">保存记录</button></div>
+    </form>
+  </div>
+  <p class="note">记录规则：填写的是你原本准备花、最终避免支出的金额。若只是打折购买，请记录真正省下的差价，而不是商品原价。</p>
+</section>
+
+<section id="history" class="view">
+  <div class="section-head"><h2>全部记录</h2><span id="historyCount">0 条</span></div>
+  <div class="card" id="historyList"></div>
+</section>
+
+<section id="settings" class="view">
+  <div class="section-head"><h2>数据与隐私</h2><span>本机存储</span></div>
+  <div class="card">
+    <div class="rowline"><span>数据存储</span><b>仅此设备的浏览器</b></div>
+    <div class="rowline"><span>自动保存</span><b>开启</b></div>
+    <div class="rowline"><span>导出备份</span><button class="smallbtn" onclick="exportData()">导出 JSON</button></div>
+    <div class="rowline"><span>导出表格</span><button class="smallbtn" onclick="exportCSV()">导出 CSV</button></div>
+    <div class="rowline"><span>恢复备份</span><button class="smallbtn" onclick="document.getElementById('importFile').click()">导入 JSON</button></div>
+    <input id="importFile" type="file" accept="application/json" hidden onchange="importData(event)">
+    <div class="rowline"><span>清空全部记录</span><button class="smallbtn danger" onclick="clearAll()">清空数据</button></div>
+  </div>
+  <p class="note">重要：清除 Safari 网站数据、卸载相关网页数据或更换设备，可能导致本机记录丢失。请定期导出 JSON 备份。此版本不连接银行账户、不上传数据，也没有云端同步。</p>
+</section>
+
+<nav>
+  <button class="tab active" data-view="home" onclick="show('home')">首页</button>
+  <button class="tab" data-view="add" onclick="newRecord()">记一笔</button>
+  <button class="tab" data-view="history" onclick="show('history')">记录</button>
+  <button class="tab" data-view="settings" onclick="show('settings')">设置</button>
+</nav>
+<footer>少花了 LessSpend · 给每一次理性选择一个记录</footer>
+</div>
+<script>
+const KEY='lessspend_records_v1';
+let records=load();
+const $=id=>document.getElementById(id);
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(records));render()}
+function fmt(n,c='USD'){try{return new Intl.NumberFormat('zh-CN',{style:'currency',currency:c,maximumFractionDigits:2}).format(Number(n)||0)}catch(e){return c+' '+Number(n||0).toFixed(2)}}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function monthKey(d){return (d||'').slice(0,7)}
+function show(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.view===v));if(v==='history')renderHistory();if(v==='home')render()}
+function newRecord(){resetForm();show('add')}
+function resetForm(){ $('recordForm').reset();$('editId').value='';$('date').value=new Date().toISOString().slice(0,10);$('formTitle').textContent='记下一次成功克制'}
+function entryHTML(r){return `<div class="entry"><div class="emoji">${({'购物':'🛍️','餐饮':'🥡','数码产品':'📱','娱乐':'🎟️','出行':'🚕','订阅服务':'📺','其他':'✨'}[r.category]||'✨')}</div><div class="entry-main"><b>${esc(r.thing)}</b><small>${esc(r.date)} · ${esc(r.category)}${r.reason?' · '+esc(r.reason):''}</small></div><div class="entry-amt">${fmt(r.amount,r.currency)}<small>避免支出</small></div></div>`}
+function render(){
+ const total=records.reduce((s,r)=>s+Number(r.amount||0),0);
+ // Totals are intentionally shown per currency separately in detailed history; headline uses the selected default currency only.
+ const currencies=[...new Set(records.map(r=>r.currency))];
+ const primary=currencies.length===1?currencies[0]:'USD';
+ const same=records.filter(r=>r.currency===primary);
+ $('total').textContent=fmt(same.reduce((s,r)=>s+Number(r.amount||0),0),primary);
+ const mk=new Date().toISOString().slice(0,7), mr=records.filter(r=>monthKey(r.date)===mk);
+ const mc=mr.filter(r=>r.currency===primary);
+ $('monthTotal').textContent=fmt(mc.reduce((s,r)=>s+Number(r.amount||0),0),primary);
+ $('count').textContent=records.length;
+ $('monthCount').textContent=mr.length+' 次';
+ $('average').textContent=fmt(mc.length?mc.reduce((s,r)=>s+Number(r.amount||0),0)/mc.length:0,primary);
+ $('monthLabel').textContent=mk;
+ $('recentCount').textContent=records.length+' 条记录';
+ const recent=[...records].sort((a,b)=>b.date.localeCompare(a.date)||b.created-b.created).slice(0,5);
+ $('recent').innerHTML=recent.length?recent.map(entryHTML).join(''):'<div class="empty">还没有记录。<br>第一次克制消费，值得被记下来 🌱</div>';
+}
+function renderHistory(){
+ const sorted=[...records].sort((a,b)=>b.date.localeCompare(a.date)||b.created-a.created);
+ $('historyCount').textContent=records.length+' 条';
+ $('historyList').innerHTML=sorted.length?sorted.map(r=>`<div>${entryHTML(r)}<div style="display:flex;justify-content:flex-end;gap:7px;padding:0 0 9px"><button class="smallbtn" onclick="editRecord('${r.id}')">编辑</button><button class="smallbtn danger" onclick="deleteRecord('${r.id}')">删除</button></div></div>`).join(''):'<div class="empty">这里还空着。<br>记录会按日期显示在这里。</div>';
+}
+$('recordForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const amount=Number($('amountInput').value);
+ if(!Number.isFinite(amount)||amount<=0){alert('请输入大于 0 的金额');return}
+ const id=$('editId').value;
+ const old=records.find(r=>r.id===id);
+ const item={id:id||crypto.randomUUID(),thing:$('thing').value.trim(),amount,currency:$('currency').value,category:$('category').value,date:$('date').value,reason:$('reason').value.trim(),created:old?.created||Date.now()};
+ if(!item.thing||!item.date){alert('请填写商品/事项和日期');return}
+ if(id)records=records.map(r=>r.id===id?item:r);else records.push(item);
+ persist();resetForm();show('home');
+});
+function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return;show('add');$('formTitle').textContent='编辑这条记录';$('editId').value=r.id;$('thing').value=r.thing;$('amountInput').value=r.amount;$('currency').value=r.currency;$('category').value=r.category;$('date').value=r.date;$('reason').value=r.reason||''}
+function deleteRecord(id){if(!confirm('确定删除这条记录吗？'))return;records=records.filter(r=>r.id!==id);persist();renderHistory()}
+function exportData(){const blob=new Blob([JSON.stringify({app:'LessSpend',version:1,exportedAt:new Date().toISOString(),records},null,2)],{type:'application/json'});download(blob,'lessspend-backup-'+new Date().toISOString().slice(0,10)+'.json')}
+function exportCSV(){const cols=['date','thing','amount','currency','category','reason'];const rows=[cols,...records.map(r=>cols.map(k=>r[k]??''))];const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');download(new Blob([csv],{type:'text/csv;charset=utf-8'}),'lessspend-records.csv')}
+function download(blob,name){const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function importData(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);const incoming=Array.isArray(data)?data:data.records;if(!Array.isArray(incoming))throw Error();if(!confirm('导入会覆盖当前设备上的全部记录，确定继续吗？'))return;records=incoming;persist();alert('备份已恢复');}catch(err){alert('文件格式不正确，无法导入')}e.target.value=''};reader.readAsText(f)}
+function clearAll(){if(!confirm('确定清空全部记录？建议先导出备份。此操作无法撤销。'))return;records=[];persist();renderHistory()}
+render();resetForm();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

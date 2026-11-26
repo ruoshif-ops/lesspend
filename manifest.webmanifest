@@ -1,0 +1,11 @@
+{
+  "name": "少花了 LessSpend",
+  "short_name": "少花了",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f7f2",
+  "theme_color": "#f7f7f2",
+  "description": "适配 iPhone Duo 内外屏的私人省钱记录工具",
+  "icons": []
+}
